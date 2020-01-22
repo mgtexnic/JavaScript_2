@@ -28,6 +28,7 @@ main {
     margin-top: 20px;
     margin-right: 100px;
     background: #bfbfbe;
+    outline: none;
     border-radius: 16px;
     font: 400 17px Arial, RomanT, sans-serif;
     text-align: center;
@@ -43,13 +44,14 @@ main {
     width: 100%;
     background: #927f6b;
     border-radius: 0 0 20px 20px;
+    margin-bottom: 20px;
 }
 
 .goods-item {
     float: left;
     position: relative;
     width: 21%;
-    height: 300px;
+    height: 345px;
     border: 2px solid #1c4e52;
     border-radius: 10px;
     padding: 10px;
@@ -66,7 +68,7 @@ main {
 
 div.goods-item p {
     position: absolute;
-    bottom: 10px;
+    bottom: 55px;
     left: 45px;
     color: #000000;
     border: 2px solid #736682;
@@ -87,4 +89,22 @@ div.goods-item img {
     margin-top: 15px;
     width: 150px;
     height: 150px;
+}
+
+div.goods-item button {
+    position: absolute;
+    bottom: 16px;
+    left: 57px;
+    height: 25px;
+    width: 90px;
+    border-radius: 5px;
+    outline: none;
+}
+
+div.goods-item button:hover {
+    background-color: #ffa698;
+}
+
+div.goods-item button:active{
+    background-color: #c5ffac;
 }

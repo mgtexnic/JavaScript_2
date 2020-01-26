@@ -1,3 +1,26 @@
+
+const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
+
+function makeGetRequest(url) {
+    return new Promise((resolve, reject) => {
+        let xhr;
+        if (window.XMLHttpRequest) {
+            xhr = new window.XMLHttpRequest();
+        } else  {
+            xhr = new window.ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                return resolve(xhr.responseText);
+            }
+        };
+
+        xhr.open('GET', url);
+        xhr.send();
+    });
+}
+
 class GoodsItem {
     constructor(id, title = 'На данный момент товар отсутствует', price = '-', img = 'images/default_image.jpg') {
         this.id = id;
@@ -22,6 +45,32 @@ class GoodsList {
         this.container = document.querySelector(container);
         this.goods = [];
     }
+    initListeners() {}
+    findGood(id) {
+        return this.goods.find(good => good.id === id);
+    }
+    fetchGoods() {}
+    totalSum() {
+        let sum = 0;
+        for (const good of this.goods) {
+            if (good.price) {
+                sum += good.price;
+            }
+        }
+        return sum;
+    }
+    render() {
+        let listHtml = '';
+        this.goods.forEach(good => {
+            const goodItem = new GoodsItem(good.id_product, good.product_name, good.price, good.img);
+            listHtml += goodItem.render();
+        });
+        this.container.innerHTML = listHtml;
+        this.initListeners();
+    }
+}
+
+class GoodsPage extends GoodsList {
     initListeners() {
         const buttons = [...this.container.querySelectorAll('.js-add-to-cart')];
         buttons.forEach(button => {
@@ -31,60 +80,61 @@ class GoodsList {
             })
         })
     }
-    findGood(id) {
-        return this.goods.find(good => good.id === id);
+    fetchGoods(callback) {
+        makeGetRequest(`${API_URL}/catalogData.json`, (goods) => {
+            this.goods = JSON.parse(goods);
+            callback();
+        })
     }
     addToCart(goodId) {
         const good = this.findGood(goodId);
         console.log(good);
     }
-    totalPriceGoods(){
-        let totalPrice = 0;
-        this.goods.forEach(good => {
-            totalPrice += good.price;
-        });
-        return totalPrice;
-    }
-    fetchGoods() {
-        this.goods = [
-            {id: 1, title: "Робот-пылесос xiaomi", price: 20000, img: 'https://via.placeholder.com/250'},
-            {id: 2, title: "Samsung Galaxy", price: 21500, img: 'https://via.placeholder.com/250'},
-            {id: 3, title: "Стиральная машина hotpoint", price: 32000, img: 'https://via.placeholder.com/250'},
-            {id: 4, title: "Умные часы apple watch", price: 26000, img: 'https://via.placeholder.com/250'},
-            {id: 5, title: "Посудомоечная машина bosh", price: 18600, img: 'https://via.placeholder.com/250'},
-        ]
-    }
-    render() {
-        let listHtml = '';
-        this.goods.forEach(good => {
-            const goodItem = new GoodsItem(good.id, good.title, good.price, good.img);
-            listHtml += goodItem.render();
-        });
-        this.container.innerHTML = listHtml;
-        this.initListeners();
-    }
 }
 
-class Basket {
-    countTotalPrice(){
+class Cart extends GoodsList {
+    addToCart(callback) {
+        makeGetRequest(`${API_URL}/addToBasket.json`, (Item) => {
+            this.goods = JSON.parse(Item);
+            callback();
+        })
+    }
+    removeFromCart(callback) {
+        makeGetRequest(`${API_URL}/deleteFromBasket.json`, (Item) => {
+            this.goods = JSON.parse(Item);
+            callback();
+        })
+    }
+    listDataCart(callback) {
+        makeGetRequest(`${API_URL}/getBasket.json`, (Item) => {
+            this.goods = JSON.parse(Item);
+            callback();
+        })
+    }
+    cleanCart() {
 
     }
-
-    countTotalNumber() {
-
-    }
-
-    outBasketDataToHtml() {
+    updateCartItem(goodId, goods) {
 
     }
 }
 
-class BasketItem {
+class CartItem extends GoodsItem {
+    constructor(...attrs) {
+        super(attrs);
+        this.count = 0;
+    }
+    incCount() {
 
+    }
+    decCount() {
 
-
+    }
 }
 
-const list = new GoodsList('.goods-list');
-list.fetchGoods();
-list.render();
+const list = new GoodsPage('.goods-list');
+list.fetchGoods(() => {
+    list.render();
+});
+
+

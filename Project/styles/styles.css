@@ -21,6 +21,18 @@ main {
     border-radius: 0 0 20px 20px;
 }
 
+.goods-search {
+    position: absolute;
+    margin-left: 60px;
+    margin-top: 25px;
+    font: 400 16px Arial, RomanT, sans-serif;
+}
+
+.goods-search-value,
+.goods-search-button{
+    font-size: 16px;
+}
+
 .cart-button {
     float: right;
     width: 115px;

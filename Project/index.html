@@ -1,20 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>eShop</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-<header>
-    <button class="cart-button">Корзина</button>
-</header>
-<main>
-    <div class="goods-list"></div>
-</main>
+<div id="app">
+    <header>
+        <form class="goods-search">
+            <input type="text" class="goods-search-value" v-model="searchLine">
+            <button class="goods-search-button" v-on:click = "FilterGoods">Искать</button>
+        </form>
+        <div class="cart">
+            <button class="cart-button" v-on:click = "isVisibleCartBlock">Корзина</button>
+            <div class="cart-container">
+                <ul class="cart-goods">
+                    <li>Товары:{{cartGoods}}</li>
+                    <li>Количество товаров:{{countGoodsCart}}</li>
+                    <li>Общая стоимость:{{fullCost}}</li>
+                    <button>Заказать</button>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="goods-list">
+            <h1 v-if = "goods == 0">«Нет данных»</h1>
+            <div class="goods-item" v-for="good in filteredGoods" :key="good.id_product">
+                <img src="images/default_image.jpg" alt="alt">
+                <h3>{{ good.product_name }}</h3>
+                <p>{{ good.price }}</p>
+                <button class = "send-button">Добавить</button>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

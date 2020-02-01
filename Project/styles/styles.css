@@ -14,11 +14,29 @@ header {
     border-radius: 20px 20px 0 0;
 }
 
-main {
-    background: #b39d32;
-    width: auto;
-    height: auto;
-    border-radius: 0 0 20px 20px;
+.goods-search {
+    position: absolute;
+    margin-left: 60px;
+    margin-top: 25px;
+    font: 400 16px Arial, RomanT, sans-serif;
+}
+
+.cart {
+    margin-left: auto;
+    position: relative;
+}
+
+.cart-container {
+    position: absolute;
+    right: 0;
+    top: 80px;
+    min-width: 400px;
+    min-height: 150px;
+    background-color: #fff;
+    border: 1px solid #f6f6f6;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    font: 400 15px Arial, RomanT, sans-serif;
 }
 
 .cart-button {
@@ -35,8 +53,16 @@ main {
 }
 
 .cart-button:hover {
+    cursor: pointer;
+    transform: scale(1.05);
     background-color: #00ff03;
+}
 
+main {
+    background: #b39d32;
+    width: auto;
+    height: auto;
+    border-radius: 0 0 20px 20px;
 }
 
 .goods-list {
@@ -66,21 +92,6 @@ main {
     background-color: #fff3a6;
 }
 
-div.goods-item p {
-    position: absolute;
-    bottom: 55px;
-    left: 45px;
-    color: #000000;
-    border: 2px solid #736682;
-    border-radius: 7px;
-    width: 21px;
-    height: 27px;
-    margin: 0;
-    padding: 10px 60px 3px 30px;
-    text-align: center;
-    font: 600 20px Arial, RomanT, sans-serif;
-}
-
 div.goods-item h3 {
     text-decoration: underline;
 }
@@ -107,4 +118,31 @@ div.goods-item button:hover {
 
 div.goods-item button:active{
     background-color: #c5ffac;
+}
+
+div.goods-item p {
+    position: absolute;
+    bottom: 55px;
+    left: 45px;
+    color: #000000;
+    border: 2px solid #736682;
+    border-radius: 7px;
+    width: 21px;
+    height: 27px;
+    margin: 0;
+    padding: 10px 60px 3px 30px;
+    text-align: center;
+    font: 600 20px Arial, RomanT, sans-serif;
+}
+
+.goods-item img {
+    width: 100%;
+}
+
+ul {
+    list-style-type: none;
+}
+
+li {
+    padding-bottom: 20px;
 }

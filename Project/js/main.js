@@ -1,90 +1,67 @@
-class GoodsItem {
-    constructor(id, title = 'На данный момент товар отсутствует', price = '-', img = 'images/default_image.jpg') {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.img = img;
-    }
-    render() {
-        return `
-            <div class="goods-item" data-id="${this.id}">
-                <img src="${this.img}" alt="alt">
-                <h3>${this.title}</h3>
-                <p>${this.price}</p>
-                <button class="js-add-to-cart">Добавить</button>
-            </div>
-        `;
-    }
-}
+const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
 
-class GoodsList {
-    constructor(container) {
-        this.container = document.querySelector(container);
-        this.goods = [];
+const app = new Vue({
+    el: '#app',
+    data: {
+        goods: [],
+        filteredGoods: [],
+        searchLine: '',
+        isVisibleCart: 'false',
+        cartGoods: [],
+        fullCost: '0',
+        countGoodsCart: '0',
+    },
+    methods: {
+        makeGetRequest(url) {
+            return new Promise((resolve, reject) => {
+                let xhr;
+                if (window.XMLHttpRequest) {
+                    xhr = new window.XMLHttpRequest(); // readyState = 1
+                } else {
+                    xhr = new window.ActiveXObject("Microsoft.XMLHTTP")
+                }
+
+                xhr.onreadystatechange = function () { // xhr changed
+                    if (xhr.readyState === 4) {
+                        if (xhr.status !== 200) {
+                            reject(xhr.responseText);
+                            return
+                        }
+                        const body = JSON.parse(xhr.responseText);
+                        resolve(body)
+                    }
+                };
+
+                xhr.onerror = function (err) {
+                    reject(err)
+                };
+
+                xhr.open('GET', url);
+                xhr.send(); // readyState 2
+            });
+        },
+        async fetchGoods() {
+            try {
+                this.goods = await this.makeGetRequest(`${API_URL}/catalogData.json`)
+                this.filteredGoods = [...this.goods];
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        isVisibleCartBlock() {
+            if(this.isVisibleCart === false){
+                document.querySelector('.cart-container').style.display = 'block';
+                return this.isVisibleCart = true;
+            }else{
+                document.querySelector('.cart-container').style.display = 'none';
+                return this.isVisibleCart = false;
+            }
+        },
+        FilterGoods() {
+            console .log( 'test' );
+        }
+    },
+    mounted() {
+        this.fetchGoods();
     }
-    initListeners() {
-        const buttons = [...this.container.querySelectorAll('.js-add-to-cart')];
-        buttons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const goodId = event.target.parentElement.getAttribute('data-id');
-                this.addToCart(parseInt(goodId, 10));
-            })
-        })
-    }
-    findGood(id) {
-        return this.goods.find(good => good.id === id);
-    }
-    addToCart(goodId) {
-        const good = this.findGood(goodId);
-        console.log(good);
-    }
-    totalPriceGoods(){
-        let totalPrice = 0;
-        this.goods.forEach(good => {
-            totalPrice += good.price;
-        });
-        return totalPrice;
-    }
-    fetchGoods() {
-        this.goods = [
-            {id: 1, title: "Робот-пылесос xiaomi", price: 20000, img: 'https://via.placeholder.com/250'},
-            {id: 2, title: "Samsung Galaxy", price: 21500, img: 'https://via.placeholder.com/250'},
-            {id: 3, title: "Стиральная машина hotpoint", price: 32000, img: 'https://via.placeholder.com/250'},
-            {id: 4, title: "Умные часы apple watch", price: 26000, img: 'https://via.placeholder.com/250'},
-            {id: 5, title: "Посудомоечная машина bosh", price: 18600, img: 'https://via.placeholder.com/250'},
-        ]
-    }
-    render() {
-        let listHtml = '';
-        this.goods.forEach(good => {
-            const goodItem = new GoodsItem(good.id, good.title, good.price, good.img);
-            listHtml += goodItem.render();
-        });
-        this.container.innerHTML = listHtml;
-        this.initListeners();
-    }
-}
-
-class Basket {
-    countTotalPrice(){
-
-    }
-
-    countTotalNumber() {
-
-    }
-
-    outBasketDataToHtml() {
-
-    }
-}
-
-class BasketItem {
-
-
-
-}
-
-const list = new GoodsList('.goods-list');
-list.fetchGoods();
-list.render();
+});

@@ -5,20 +5,23 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>eShop</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-<header>
-    <form class="goods-search">
-        <input type = "text" class = "goods-search-value"/>
-        <button class = "goods-search-button">Искать</button>
-    </form>>
-    <button class = "cart-button" type = "button" >Корзина</button>
-</header>
-<main>
-    <div class="goods-list"></div>
-</main>
+<div id="app">
+    <header>
+        <searchform @submit.prevent></searchform>
+        <div class = "cart">
+            <button class="cart-button" @click = "isVisibleCartBlock">Корзина</button>
+            <cart-container v-if = "isVisibleCart"></cart-container>
+        </div>
+    </header>
+    <main>
+        <goods-list :goods = "filteredGoods"></goods-list>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,37 @@
+[
+  {
+    "type": "add",
+    "name": "Клавиатура",
+    "createdAt": 1581523628662
+  },
+  {
+    "type": "add",
+    "name": "Коврик",
+    "createdAt": 1581523641099
+  },
+  {
+    "type": "add",
+    "name": "Мышка",
+    "createdAt": 1581523642925
+  },
+  {
+    "type": "add",
+    "name": "Наушники",
+    "createdAt": 1581523668121
+  },
+  {
+    "type": "add",
+    "name": "Клавиатура",
+    "createdAt": 1581524013793
+  },
+  {
+    "type": "add",
+    "name": "Мышка",
+    "createdAt": 1581524020975
+  },
+  {
+    "type": "add",
+    "name": "Кресло",
+    "createdAt": 1581524030725
+  }
+]

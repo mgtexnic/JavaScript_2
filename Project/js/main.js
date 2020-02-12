@@ -1,175 +1,158 @@
 
-const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
 
-const goodsInCart = [];
+Vue.component('searchform', {
+    template: ` <form class="goods-search">
+                    <input type="text" class="goods-search-value" v-model="searchLine">
+                    <button class="goods-search-button" @click = "FilterGoods">Искать</button>
+                </form>`
+});
 
-function makeGetRequest(url) {
-    return new Promise((resolve, reject) => {
-        let xhr;
-        if (window.XMLHttpRequest) {
-            xhr = new window.XMLHttpRequest();
-        } else  {
-            xhr = new window.ActiveXObject("Microsoft.XMLHTTP");
+Vue.component('cart-container', {
+    props:['isVisibleCart', 'cartGoods', 'fullCost', 'countGoodsCart'],
+    template: ` <div class="cart-container">
+                    <ul class="cart-goods">
+                        <li>Товары:{{cartGoods}}</li>
+                        <li>Количество товаров:{{countGoodsCart}}</li>
+                        <li>Общая стоимость:{{fullCost}}</li>
+                        <button>Заказать</button>
+                    </ul>
+                </div>`
+});
+
+Vue.component('goods-item', {
+    props:['good'],
+    methods: {
+        addToCart(){
+            return this.$emit('add', this.good);
         }
+    },
+    template: `<div class="goods-item">
+                 <img :src=good.img  alt="alt" />
+                 <h3>{{ good.name }}</h3>
+                 <p>{{ good.price }}</p>
+                 <button @click = "addToCart">Добавить</button>
+               </div>`
+});
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                if(xhr.status !== 200) {
-                    reject(xhr.responseText)
-                }
-                const body = JSON.parse(xhr.responseText);
-                resolve(body)
-            }
-        };
+Vue.component('errormessage', {
+    template: `<h3>«Ошибка связи с севвером, попробуйте повторить запрос позже»</h3>`
+});
 
-        xhr.open('GET', url);
-        xhr.send();
-    });
-}
-
-class GoodsItem {
-    constructor(id, title = 'На данный момент товар отсутствует', price = '-', img = 'images/default_image.jpg') {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.img = img;
-    }
-    render() {
-        return `
-            <div class="goods-item" data-id="${this.id}">
-                <img src="${this.img}" alt="alt">
-                <h3>${this.title}</h3>
-                <p>${this.price}</p>
-                <button class="js-add-to-cart">Добавить</button>
-            </div>
-        `;
-    }
-}
-
-class GoodsList {
-    constructor(container) {
-        this.container = document.querySelector(container);
-        this.goods = [];
-        this.filteredGoods = [];
-    }
-    initListeners() {}
-    findGood(id) {
-        return this.goods[id];
-    }
-    fetchGoods() {}
-    totalSum() {
-        let sum = 0;
-        for (const good of this.goods) {
-            if (good.price) {
-                sum += good.price;
-            }
+Vue.component('goods-list', {
+    props:['goods'],
+    methods: {
+        addToCart(good){
+            return this.$emit('add', good);
         }
-        return sum;
-    }
-    render() {
-        let listHtml = '';
-        this.filteredGoods.forEach((good, index) => {
-            const goodItem = new GoodsItem(index, good.product_name, good.price, good.img);
-            listHtml += goodItem.render();
-        });
-        this.container.innerHTML = listHtml;
-        this.initListeners();
-    }
-}
-
-class GoodsPage extends GoodsList {
-    initListeners() {
-        const buttons = [...this.container.querySelectorAll('.js-add-to-cart')];
-        buttons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const goodId = event.target.parentElement.getAttribute('data-id');
-                this.addToCart(parseInt(goodId, 10));
-            })
-        });
-        const searchForm = document.querySelector('.goods-search');
-        const searchValue = document.querySelector('.goods-search-value');
-        searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let value = searchValue.value;
-            value = value.trim();
-            this.filterGoods(value);
-
-        });
-    }
-    async fetchGoods() {
-        try{
-            this.goods = await makeGetRequest(`${API_URL}/catalogData.json`)
-            this.filteredGoods = [...this.goods];
-        }catch(err){
-            console.error(`Ошибка: ${err}`)
-        }
-    }
-    filterGoods(value) {
-        const regexp = new RegExp(value, 'i');
-        this.filteredGoods = this.goods.filter((good) => {
-            return regexp.test(good.product_name);
-        });
-        this.render();
-    }
-    async addToCart(goodId) {
-        try{
-            const good = this.findGood(goodId);
-            await makeGetRequest(`${API_URL}/addToBasket.json`);
-            goodsInCart.push(good);
-        }catch (e) {
-            console.error(`Ошибка: ${err}`)
-        }
-    }
-    async removeFromCart() {
-        try{
-            await makeGetRequest(`${API_URL}/deleteFromBasket.jso`);
-            if(goodsInCart.length > 0) {
-                goodsInCart.pop();
-            }
-        }catch (e) {
-            console.error(`Ошибка: ${err}`)
-        }
-    }
-    async listDataCart() {
-        try{
-            await makeGetRequest(`${API_URL}/getBasket.json`);
-        }catch (e) {
-            console.error(`Ошибка: ${err}`)
-        }
-    }
-}
-
-class Cart extends GoodsList {
-    addToCart(good) {
-        this.goods.push(good);
-    }
-    removeFromCart() {
-        this.goods.pop();
-    }
-    cleanCart() {
-
-    }
-    updateCartItem(goodId, goods) {
-
-    }
-}
-
-class CartItem extends GoodsItem {
-    constructor(...attrs) {
-        super(attrs);
-        this.count = 0;
-    }
-    incCount() {
-
-    }
-    decCount() {
-
-    }
-}
-
-const list = new GoodsPage('.goods-list');
-list.fetchGoods().then(() => {
-    list.render();
+    },
+    template: `<div class="goods-list">
+                 <errormessage v-if = "goods == 0"></errormessage>
+                   <goods-item v-for="good in goods" @add = "addToCart"
+                        :key="good.id" :good="good"></goods-item>
+                   </div>
+               </div>`
 });
 
 
+const app = new Vue({
+    el: '#app',
+    data: {
+        goods: [],
+        filteredGoods: [],
+        searchLine: '',
+        isVisibleCart: false,
+        cartGoods: [],
+        fullCost: '0',
+        countGoodsCart: '0',
+    },
+    methods: {
+        makeGetRequest(url) {
+            return new Promise((resolve, reject) => {
+                let xhr;
+                if (window.XMLHttpRequest) {
+                    xhr = new window.XMLHttpRequest();
+                } else {
+                    xhr = new window.ActiveXObject("Microsoft.XMLHTTP")
+                }
+
+                xhr.onreadystatechange = function () { // xhr changed
+                    if (xhr.readyState === 4) {
+                        if (xhr.status !== 200) {
+                            reject(xhr.responseText);
+                            return
+                        }
+                        const body = JSON.parse(xhr.responseText);
+                        resolve(body)
+                    }
+                };
+
+                xhr.onerror = function (err) {
+                    reject(err)
+                };
+
+                xhr.open('GET', url);
+                xhr.send(); // readyState 2
+            });
+        },
+        makePostRequest(url, data) {
+            return new Promise((resolve, reject) => {
+                let xhr;
+                if (window.XMLHttpRequest) {
+                    xhr = new window.XMLHttpRequest();
+                } else {
+                    xhr = new window.ActiveXObject("Microsoft.XMLHTTP")
+                }
+
+                xhr.onreadystatechange = function () { // xhr changed
+                    if (xhr.readyState === 4) {
+                        if (xhr.status !== 200) {
+                            reject(xhr.responseText);
+                            return
+                        }
+                        const body = JSON.parse(xhr.responseText);
+                        resolve(body)
+                    }
+                };
+
+                xhr.onerror = function (err) {
+                    reject(err)
+                };
+
+                xhr.open('POST', url);
+                xhr.setRequestHeader('content-type', 'application/json');
+                xhr.send(JSON.stringify(data)); // readyState 2
+            });
+        },
+        async fetchGoods() {
+            try {
+                this.goods = await this.makeGetRequest(`/api/goods`);
+                this.filteredGoods = [...this.goods];
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async addToCart(good){
+            try{
+                this.makePostRequest('/api/cart', good);
+            }catch (e) {
+                console.error(e)
+            }
+        },
+        isVisibleCartBlock() {
+            if(this.isVisibleCart === false){
+                return this.isVisibleCart = true;
+            }else{
+                return this.isVisibleCart = false;
+            }
+        },
+        FilterGoods() {
+            const regexp = new RegExp(this.searchLine, 'i');
+            this.filteredGoods = this.goods.filter((good) => {
+                return regexp.test(good.name);
+            });
+        }
+    },
+    mounted() {
+        this.fetchGoods();
+    }
+});
